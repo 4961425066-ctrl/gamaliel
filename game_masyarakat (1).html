@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="theme-color" content="#17324d"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bermasyarakat — Soal & Petualangan</title>
+<style>
+:root{color-scheme:light;--ink:#19344d;--blue:#2878b8;--pale:#edf6ff;--green:#16845b;--gold:#f2b544;--red:#c64e58}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:var(--ink);background:linear-gradient(135deg,#e8f5ff,#fff7e8)}
+header{text-align:center;padding:23px 14px 27px;background:linear-gradient(120deg,#17324d,#28789b);color:white}
+header .logo{font-size:42px}header h1{margin:5px 0;font-size:clamp(26px,5vw,39px)}header p{margin:7px 0 0;color:#dceefa}
+main{max-width:960px;margin:22px auto;padding:0 14px 30px}.panel{background:white;border-radius:20px;padding:21px;box-shadow:0 9px 28px #18344c17;margin-bottom:17px}
+h2{margin:0 0 9px}.muted{color:#62768a;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}
+.tile{border:2px solid #dce8f1;background:#fff;border-radius:16px;padding:15px;text-align:left;cursor:pointer;min-height:135px;transition:.16s}
+.tile:hover{transform:translateY(-3px);border-color:var(--blue);background:#f7fbff}.tile.sel{border-color:var(--blue);background:var(--pale)}
+.tile .emoji{font-size:30px}.tile b{display:block;margin:7px 0;font-size:17px}.tile small{color:#63778a;line-height:1.4}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.pill{background:#edf4fa;border-radius:30px;padding:8px 12px;font-weight:bold;font-size:14px}
+.btn{border:0;border-radius:12px;padding:13px 18px;font-size:15px;font-weight:bold;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eaf1f7;color:var(--ink)}.primary:disabled{opacity:.45;cursor:not-allowed}
+.level{border:2px solid #dce8f1;background:white;border-radius:12px;padding:9px 14px;font-weight:bold;cursor:pointer}.level.active{border-color:var(--blue);background:var(--pale);color:var(--blue)}
+.hidden{display:none!important}.center{text-align:center}
+#progress{height:10px;background:#e6edf3;border-radius:20px;overflow:hidden;flex:1;min-width:90px}#bar{height:100%;background:var(--green);width:0;transition:.25s}
+#timer{font-variant-numeric:tabular-nums}#scenario{background:#fff8e9;border-left:4px solid var(--gold);padding:12px 14px;border-radius:10px;line-height:1.5;margin:14px 0}
+#prompt{font-size:clamp(18px,3vw,22px);font-weight:bold;line-height:1.45;margin:17px 0}
+.answers{display:grid;gap:10px}.answer{border:2px solid #dce6ef;border-radius:13px;background:white;text-align:left;padding:13px;font-size:15px;line-height:1.4;cursor:pointer}.answer:hover{border-color:var(--blue);background:#f5faff}.answer:disabled{opacity:1;cursor:default}.answer.good{border-color:var(--green);background:#eaf8f0}.answer.bad{border-color:var(--red);background:#fff0f0}
+#feedback{min-height:52px;margin:14px 0;line-height:1.5;font-weight:bold}
+.big{font-size:40px;font-weight:800;color:var(--green)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0}.stat{background:#eef5fa;padding:12px;border-radius:12px}.stat b{display:block;font-size:22px;margin-top:4px}
+footer{text-align:center;padding:0 14px 24px;color:#63778a;font-size:13px}
+@media(max-width:540px){.panel{padding:16px}.stats{grid-template-columns:1fr 1fr}.stat:last-child{grid-column:span 2}}
+.btn:disabled{opacity:.5}.answer:active,.btn:active{transform:scale(.97)}
+.tile,.answer,.level{color:var(--ink)}
+#adventure{position:relative;margin:0 auto 17px;padding:0;border-radius:14px;background:#000;overflow:hidden}
+#wrap{--u:1;position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;margin:0;touch-action:none;user-select:none;-webkit-user-select:none}
+#cv{width:100%;height:100%;display:block;touch-action:none}
+#hud{position:absolute;top:calc(var(--u)*8px);left:calc(var(--u)*8px);display:flex;flex-direction:column;gap:calc(var(--u)*5px);z-index:3;pointer-events:none}#hud .pill{font-size:calc(var(--u)*14px);padding:calc(var(--u)*4px) calc(var(--u)*10px);background:#fffe}
+#exit{position:absolute;top:calc(var(--u)*8px);right:calc(var(--u)*8px);width:calc(var(--u)*42px);height:calc(var(--u)*42px);border-radius:50%;border:2px solid #fff;background:#0009;color:#fff;font-size:calc(var(--u)*18px);z-index:3}
+#msg{position:absolute;left:calc(var(--u)*130px);top:calc(var(--u)*8px);width:calc(var(--u)*560px);background:#fff;color:#19344d;border-radius:calc(var(--u)*12px);padding:calc(var(--u)*8px) calc(var(--u)*12px);text-align:left;font-size:calc(var(--u)*15px);line-height:1.45;box-shadow:0 3px 12px #0004;pointer-events:none}#msg:empty{display:none}
+#big{position:absolute;left:0;right:0;top:34%;text-align:center;color:#fff;font:900 calc(var(--u)*52px) Arial;text-shadow:0 3px 8px #000;pointer-events:none}
+#lft,#rgt{position:absolute;bottom:calc(var(--u)*20px);width:calc(var(--u)*100px);height:calc(var(--u)*100px);border-radius:50%;border:3px solid #fff;background:#0007;color:#fff;font-size:calc(var(--u)*40px);touch-action:none;user-select:none;-webkit-user-select:none;z-index:4}
+#lft{left:calc(var(--u)*20px)}#rgt{left:calc(var(--u)*140px)}
+#lft.on,#rgt.on{background:#2878b8cc}
+#help{position:absolute;bottom:calc(var(--u)*20px);right:calc(var(--u)*20px);width:calc(var(--u)*210px);height:calc(var(--u)*100px);border-radius:calc(var(--u)*18px);border:3px solid #fff;background:#16845b;color:#fff;font:bold calc(var(--u)*20px) Arial;touch-action:none;user-select:none;-webkit-user-select:none;z-index:4}
+#help.off{opacity:.5;background:#555}#help.go{animation:pulse .7s infinite alternate}#help.on{filter:brightness(1.3)}@keyframes pulse{to{transform:scale(1.06)}}
+#up,#dn{position:absolute;right:calc(var(--u)*245px);width:calc(var(--u)*100px);height:calc(var(--u)*48px);border-radius:calc(var(--u)*14px);border:3px solid #fff;background:#f2b544;color:#19344d;font-size:calc(var(--u)*22px);touch-action:none;user-select:none;-webkit-user-select:none;z-index:4}#up{bottom:calc(var(--u)*72px)}#dn{bottom:calc(var(--u)*20px)}#up.on,#dn.on{filter:brightness(1.25)}
+#dlg{display:none;position:absolute;left:calc(var(--u)*90px);right:calc(var(--u)*90px);top:calc(var(--u)*30px);background:#fffffff4;border-radius:calc(var(--u)*16px);padding:calc(var(--u)*14px);z-index:6;box-shadow:0 8px 30px #0008;color:#19344d}
+#dq{font-weight:bold;font-size:calc(var(--u)*17px);line-height:1.35;margin-bottom:calc(var(--u)*8px)}
+#dtime{height:calc(var(--u)*7px);background:#e6edf3;border-radius:9px;overflow:hidden}#dtb{height:100%;background:#f2b544;width:100%}
+#da button{display:block;width:100%;text-align:left;margin-top:calc(var(--u)*6px);padding:calc(var(--u)*8px) calc(var(--u)*12px);border:2px solid #dce6ef;border-radius:calc(var(--u)*10px);background:#fff;font-size:calc(var(--u)*15px);line-height:1.3;color:#19344d;cursor:pointer}#da button:hover{border-color:#2878b8;background:#f5faff}
+</style></head>
+<body>
+<header><div class="logo">🏘️🧩🎮</div><h1>BERMASYARAKAT</h1><p>Pilih tantanganmu, pecahkan teka-teki, jadilah warga teladan!</p></header>
+<main>
+<section class="panel" id="home">
+ <h2>🎯 Pilih Mode Permainan</h2>
+ <p class="muted">Kamu bisa mengerjakan soal pilihan ganda atau menjalankan petualangan interaktif. Setiap misi mengangkat kehidupan bermasyarakat.</p>
+ <div class="grid">
+  <button class="tile" onclick="chooseMode('quiz')"><span class="emoji">📝</span><b>Mode Soal</b><small>30 detik per soal, pilih jawaban, kumpulkan poin, dan pecahkan soal teka-teki.</small></button>
+  <button class="tile" onclick="chooseMode('adventure')"><span class="emoji">🏘️</span><b>Game Masyarakat</b><small>Keliling kampung yang hidup: bantu warga sebelum kesabaran mereka habis, pilih tindakan yang benar, hindari rintangan, dan jaga staminamu.</small></button>
+ </div>
+ <div id="settings" class="hidden">
+  <h2 id="modeTitle">Pilih topik</h2><p class="muted" id="modeDesc"></p>
+  <div class="grid" id="topics"></div>
+  <div class="row"><b>Kesulitan:</b>
+   <button class="level active" onclick="setLevel('mudah',this)">🌱 Mudah</button>
+   <button class="level" onclick="setLevel('sedang',this)">🔥 Sedang</button>
+   <button class="level" onclick="setLevel('sulit',this)">🏆 Sulit</button>
+  </div>
+  <p style="margin-top:17px"><button class="btn primary" id="launch" onclick="launch()" disabled>Mulai Misi →</button></p>
+ </div>
+</section>
+
+<section class="panel hidden" id="play">
+ <div class="row"><span class="pill" id="topicName">Misi</span><span class="pill">⭐ <span id="score">0</span></span><span class="pill">🔥 <span id="streak">0</span></span></div>
+ <div class="row" style="margin-top:14px"><b id="counter">1/5</b><div id="progress"><div id="bar"></div></div><span class="pill">⏳ <span id="timer">30</span> detik</span></div>
+ <div id="scenario"></div><div id="prompt"></div>
+ <div class="answers" id="answers"></div>
+ <div id="feedback" aria-live="polite"></div>
+ <button class="btn primary" id="next" onclick="advance()" disabled>Lanjut →</button>
+ <button class="btn secondary" onclick="toHome()">Keluar</button>
+</section>
+
+<section class="panel hidden" id="adventure"><div id="wrap"><canvas id="cv" width="800" height="400"></canvas><div id="hud"><span class="pill" id="hRank">🏁</span><span class="pill">⭐ <span id="hCoin">0</span></span><span class="pill">😢 <span id="hVio">0</span></span><span class="pill">🤝 <span id="hHelp">0</span></span><span class="pill">⏱️ <span id="hTime">80</span></span></div><button id="exit" onclick="toHome()">✕</button><div id="msg"></div><div id="big"></div><button id="lft">◀</button><button id="rgt">▶</button><button id="help" class="off">🤝 BANTU</button><button id="up">▲</button><button id="dn">▼</button><div id="dlg"><div id="dq"></div><div id="dtime"><div id="dtb"></div></div><div id="da"></div></div></div></section>
+
+<section class="panel hidden center" id="result">
+ <div style="font-size:50px" id="medal">🏆</div><h2 id="resultTitle">Misi Selesai!</h2><div class="big"><span id="finalScore">0</span> poin</div>
+ <p class="muted" id="resultText"></p><div class="stats"><div class="stat">Benar<b id="rightCount">0</b></div><div class="stat">Akurasi<b id="accuracy">0%</b></div><div class="stat">Streak terbaik<b id="best">0</b></div></div>
+ <button class="btn primary" onclick="replay()">Main lagi</button> <button class="btn secondary" onclick="toHome()">Pilih mode lain</button>
+</section>
+</main><footer>Game edukasi tentang gotong royong, toleransi, musyawarah, lingkungan, dan tanggung jawab.</footer>
+<script>
+const topics={
+ gotong:{name:"Gotong Royong",emoji:"🧹",desc:"Kerja sama dan saling membantu.",qs:[
+ ["Warga kerja bakti membersihkan taman. Apa tindakan terbaik?",["Ikut membantu sesuai kemampuan","Menonton saja","Mengotori taman","Pulang tanpa kabar"],0,"Gotong royong meringankan pekerjaan dan mempererat hubungan warga."],
+ ["Kamu selesai lebih dahulu saat kerja bakti. Apa yang sebaiknya dilakukan?",["Langsung pulang","Membantu warga lain yang belum selesai","Menyembunyikan alat","Mengganggu teman"],1,"Membantu orang lain menunjukkan kepedulian."],
+ ["Dua kelompok berbeda pendapat tentang pembagian tugas. Solusi terbaik?",["Membatalkan kegiatan","Membiarkan bertengkar","Ketua memaksa pilihannya","Membagi tugas melalui diskusi yang adil"],3,"Musyawarah membuat pembagian tugas lebih adil."],
+ ["Seorang warga sakit sehingga tidak dapat ikut kerja bakti. Sikap yang tepat?",["Mengejeknya","Memaksanya hadir","Memahami kondisinya dan membagi ulang tugas","Mengucilkannya"],2,"Gotong royong juga membutuhkan empati."],
+ ["TEKA-TEKI: Aku dilakukan bersama, membuat pekerjaan berat terasa ringan. Apakah aku?",["Persaingan","Gotong royong","Hukuman","Perdebatan"],1,"Jawabannya gotong royong: bekerja bersama untuk kepentingan bersama."]
+ ]},
+ toleransi:{name:"Toleransi",emoji:"🕊️",desc:"Menghormati perbedaan dan menjaga kerukunan.",qs:[
+ ["Tetangga sedang beribadah. Apa sikap tepat?",["Mengganggu","Memutar musik keras","Menjaga ketenangan","Mengejek"],2,"Menghormati ibadah orang lain adalah bentuk toleransi."],
+ ["Teman memiliki logat daerah berbeda. Kamu sebaiknya ...",["Mengejek logatnya","Mengajaknya berkenalan","Mengucilkannya","Menghindarinya"],1,"Perbedaan daerah bukan alasan untuk membeda-bedakan."],
+ ["Dalam diskusi, teman berbeda pendapat. Apa yang kamu lakukan?",["Mendengarkan dan menghargai","Memarahinya","Memotong pembicaraan","Memaksanya setuju"],0,"Menghargai pendapat menjaga suasana rukun."],
+ ["TEKA-TEKI: Aku bukan berarti semua orang harus sama. Aku mengajarkan menghargai perbedaan. Apakah aku?",["Persaingan","Keseragaman","Keegoisan","Toleransi"],3,"Toleransi adalah sikap menghormati perbedaan."],
+ ["Komentar menghina kelompok tertentu muncul di grup warga. Tindakan bijak?",["Ikut menghina","Menyebarkan","Tidak ikut menyebar dan mengingatkan dengan sopan","Membuat ejekan baru"],2,"Sikap santun dapat mencegah konflik."]
+ ]},
+ musyawarah:{name:"Musyawarah",emoji:"🗣️",desc:"Mengambil keputusan bersama.",qs:[
+ ["Warga menentukan jadwal ronda. Cara terbaik?",["Ketua menentukan sendiri","Bermusyawarah","Mengikuti yang paling keras","Tidak membuat jadwal"],1,"Musyawarah memberi kesempatan menyampaikan pendapat."],
+ ["Saat rapat, orang lain sedang berbicara. Kamu sebaiknya ...",["Memotong","Berteriak","Mendengarkan sampai selesai","Pergi"],2,"Mendengarkan adalah bagian penting musyawarah."],
+ ["Hasil musyawarah telah disepakati. Sikap tepat?",["Menghormati dan melaksanakan","Menghina hasilnya","Mengajak melanggar","Tidak peduli"],0,"Keputusan bersama harus dihormati."],
+ ["TEKA-TEKI: Aku mempertemukan banyak pendapat untuk mencari keputusan bersama. Apakah aku?",["Perkelahian","Perlombaan","Paksaan","Musyawarah"],3,"Musyawarah mencari kesepakatan bersama."],
+ ["Keputusan rapat ternyata berdasarkan informasi keliru. Apa yang harus dilakukan?",["Menyembunyikannya","Meluruskan informasi dan meninjau keputusan","Tetap memakai informasi salah","Menyalahkan peserta"],1,"Keputusan harus berdasarkan informasi yang benar."]
+ ]},
+ lingkungan:{name:"Peduli Lingkungan",emoji:"🌳",desc:"Menjaga kebersihan dan fasilitas umum.",qs:[
+ ["Melihat sampah di taman, kamu sebaiknya ...",["Membiarkan","Menendang ke jalan","Memungut dan membuang dengan benar","Menambah sampah"],2,"Kebersihan dimulai dari tindakan sederhana."],
+ ["Keran fasilitas umum menyala tanpa digunakan. Apa tindakanmu?",["Menutupnya jika aman","Membiarkan","Merusaknya","Mengabaikan"],0,"Menghemat air adalah tanggung jawab bersama."],
+ ["Selokan tersumbat dan air menggenang. Apa tindakan tepat?",["Menunggu parah","Membuang sampah lagi","Menyalahkan tetangga","Melapor dan mengajak warga menangani dengan aman"],3,"Masalah lingkungan perlu ditangani bersama."],
+ ["TEKA-TEKI: Aku tempat sampah dipisahkan menurut jenisnya agar mudah diolah kembali. Kegiatan apakah aku?",["Pemborosan","Pemilahan sampah","Pencemaran","Pembakaran"],1,"Pemilahan sampah membantu proses pengolahan dan daur ulang."],
+ ["Program kebersihan tidak berjalan karena tugas tidak jelas. Solusi terbaik?",["Membatalkan selamanya","Menyalahkan warga","Membuat jadwal, pembagian tugas, dan evaluasi","Tidak perlu rencana"],2,"Program membutuhkan rencana dan tanggung jawab."]
+ ]},
+ tanggung:{name:"Tanggung Jawab Warga",emoji:"🛡️",desc:"Menepati kesepakatan dan menjaga keamanan.",qs:[
+ ["Menemukan dompet di taman. Apa yang kamu lakukan?",["Mengambil uangnya","Membuangnya","Menyimpan diam-diam","Menyerahkan kepada pengurus atau mencari pemilik"],3,"Kejujuran berarti berusaha mengembalikan barang temuan."],
+ ["Kamu mendapat tugas kegiatan warga. Sikap tepat?",["Melaksanakan atau memberi kabar jika berhalangan","Mengabaikan","Berpura-pura lupa","Menyuruh orang tanpa izin"],0,"Tanggung jawab berarti menjalankan kewajiban."],
+ ["Lampu jalan lingkungan mati. Apa yang tepat?",["Membongkar instalasi sendiri","Melapor kepada pengurus atau petugas","Membiarkannya","Menyalahkan tetangga"],1,"Masalah fasilitas dilaporkan kepada pihak yang berwenang."],
+ ["TEKA-TEKI: Aku dilakukan saat seseorang menepati janji dan menyelesaikan kewajibannya. Apakah aku?",["Kecerobohan","Keegoisan","Tanggung jawab","Persaingan"],2,"Tanggung jawab berarti melaksanakan kewajiban."],
+ ["Ada kabar mencurigakan di grup warga tanpa bukti. Apa tindakan bijak?",["Langsung menyebar","Menambah cerita","Menuduh orang","Memeriksa kebenaran sebelum membagikan"],3,"Periksa informasi agar tidak menimbulkan kepanikan."]
+ ]}
+};
+let mode="",topic="",level="mudah",idx=0,score=0,right=0,streak=0,best=0,locked=false,timer=null,seconds=30,activePool=[];
+const $=id=>document.getElementById(id);
+function chooseMode(m){mode=m;topic="";$("launch").disabled=true;document.querySelectorAll("#topics .tile").forEach(x=>x.classList.remove("sel"));$("settings").classList.remove("hidden");$("modeTitle").textContent=m==="quiz"?"📝 Pilih Topik Soal":"🏘️ Game Masyarakat";$("modeDesc").textContent=m==="quiz"?"Pilih materi dan jawab 5 soal. Setiap soal memiliki batas waktu 30 detik.":"Keliling kampung menuju balai warga: ◀ ▶ berjalan (atau panah / A D), ▲▼ pindah jalur (panah atas/bawah atau W/S). Dekati 8 warga yang butuh bantuan lalu TAHAN tombol BANTU (Spasi/H) — tiap warga punya batas kesabaran! Setelah itu pilih tindakan yang tepat (tombol 1-3). Hindari lubang, bola, dan ayam dengan berpindah jalur; genangan memperlambat langkahmu. Jaga stamina ⚡ dengan minum 🥤. Level sedang & sulit lebih ketat; sulit ditambah hujan licin dan senja yang cepat datang.";renderTopics();if(m==="adventure"){$("topics").classList.add("hidden");topic="adv";$("launch").disabled=false}else $("topics").classList.remove("hidden");setTimeout(()=>$("settings").scrollIntoView({behavior:"smooth",block:"start"}),100)}
+function renderTopics(){let el=$("topics");el.innerHTML="";Object.entries(topics).forEach(([k,v])=>{let b=document.createElement("button");b.className="tile";b.innerHTML=`<span class="emoji">${v.emoji}</span><b>${v.name}</b><small>${v.desc}</small>`;b.onclick=()=>{topic=k;document.querySelectorAll("#topics .tile").forEach(x=>x.classList.remove("sel"));b.classList.add("sel");$("launch").disabled=false;setTimeout(()=>$("launch").scrollIntoView({behavior:"smooth",block:"center"}),80)};el.appendChild(b)})}
+function setLevel(l,b){level=l;document.querySelectorAll(".level").forEach(x=>x.classList.remove("active"));b.classList.add("active")}
+function launch(){if(!topic)return;if(mode==="quiz")startQuiz();else startAdventure()}
+function initScore() {score=0;right=0;streak=0;best=0}
+function startQuiz(){[["rightCount","Benar"],["accuracy","Akurasi"],["best","Streak terbaik"]].forEach(([i,t])=>$(i).parentNode.firstChild.textContent=t);initScore();idx=0;activePool=topics[topic].qs.slice().sort(()=>Math.random()-.5);$("home").classList.add("hidden");$("play").classList.remove("hidden");$("topicName").textContent=topics[topic].emoji+" "+topics[topic].name;showQuiz()}
+function showQuiz(){locked=false;clearInterval(timer);seconds=30;let q=activePool[idx];$("counter").textContent=(idx+1)+"/5";$("bar").style.width=(idx/5*100)+"%";$("timer").textContent=seconds;$("score").textContent=score;$("streak").textContent=streak;$("scenario").textContent="📍 Tantangan: "+(q[0].startsWith("TEKA-TEKI")?"Pecahkan teka-teki berikut!":"Pilih tindakan paling tepat dalam kehidupan bermasyarakat.");$("prompt").textContent=q[0];$("feedback").textContent="Waktu menjawab: 30 detik.";let area=$("answers");area.innerHTML="";let order=q[1].map((_,i)=>i).sort(()=>Math.random()-.5);order.forEach((n,i)=>{let b=document.createElement("button");b.className="answer";b.textContent=String.fromCharCode(65+i)+". "+q[1][n];b.onclick=()=>answerQuiz(n,b);area.appendChild(b)});$("next").disabled=true;$("next").textContent=idx===4?"Lihat Hasil 🏁":"Soal Berikutnya →";timer=setInterval(()=>{seconds--;$("timer").textContent=seconds;if(seconds<=0)answerQuiz(-1,null)},1000)}
+function answerQuiz(n,btn){if(locked)return;locked=true;clearInterval(timer);let q=activePool[idx];document.querySelectorAll("#answers .answer").forEach(b=>{b.disabled=true;if(b.textContent.endsWith(q[1][q[2]]))b.classList.add("good")});if(n===q[2]){let base=level==="mudah"?10:level==="sedang"?15:20;let bonus=Math.floor(seconds/5)*2;streak++;best=Math.max(best,streak);let combo=streak>=3?5:0;score+=base+bonus+combo;right++;$("feedback").textContent="✅ Benar! +"+(base+bonus+combo)+" poin. "+q[3]}else{streak=0;if(btn)btn.classList.add("bad");$("feedback").textContent=(n===-1?"⏰ Waktu habis. ":"❌ Belum tepat. ")+q[3]}$("score").textContent=score;$("streak").textContent=streak;$("bar").style.width=((idx+1)/5*100)+"%";$("next").disabled=false}
+function advance(){if(!locked)return;if(idx<4){idx++;showQuiz()}else showResult()}
+function showResult(){clearInterval(timer);$("play").classList.add("hidden");$("result").classList.remove("hidden");let acc=Math.round(right/5*100);$("finalScore").textContent=score;$("rightCount").textContent=right+"/5";$("accuracy").textContent=acc+"%";$("best").textContent=best;$("medal").textContent=acc>=80?"🏆":acc>=60?"🥈":"🌱";$("resultTitle").textContent=acc>=80?"Warga Teladan!":acc>=60?"Warga Peduli!":"Terus Berlatih!";$("resultText").textContent="Kamu menyelesaikan mode soal "+topics[topic].name+". "+(acc>=80?"Hebat, pemahamanmu sangat baik!":"Pelajari pembahasan dan coba lagi untuk meningkatkan skor.")}
+
+/* ===== GAME MASYARAKAT v2 (realistis & menantang) ===== */
+const FIN=7200,PX=3.4,GY=352,ZMIN=-22,ZMAX=14,HB=282,PB=326;
+const CF={
+ mudah:{t:175,hold:60,pat:1500,sp:520,dr:.7,rain:0,dq:14},
+ sedang:{t:145,hold:85,pat:960,sp:380,dr:1,rain:0,dq:10},
+ sulit:{t:125,hold:110,pat:700,sp:300,dr:1.3,rain:1,dq:7}};
+const EV=[
+ {k:"nenek",ask:"👵 Nenek kesulitan membawa belanjaan.",btn:"🤝 BANTU NENEK",thx:"Terima kasih, Nak! Menawarkan bantuan dengan sopan itu mulia.",pt:60,q:["Nenek membawa tiga kantong belanjaan yang berat. Apa tindakan paling tepat?",["Minta izin, lalu bantu bawakan sampai rumahnya","Ambil kantongnya lalu pergi begitu saja","Biarkan saja, itu urusan Nenek"],0,"Menawarkan bantuan dengan sopan menunjukkan kepedulian."]},
+ {k:"sampah",ask:"🧹 Warga kerja bakti, sampah berserakan di jalan.",btn:"🧹 KERJA BAKTI",thx:"Kampung jadi bersih berkat gotong royong!",pt:60,q:["Saat kerja bakti, bagaimana cara menangani sampah yang terkumpul?",["Dicampur semua dalam satu karung","Dipilah organik dan anorganik, lalu dibuang pada tempatnya","Dibakar di pinggir jalan"],1,"Pemilahan sampah memudahkan pengolahan dan menjaga lingkungan."]},
+ {k:"gerobak",ask:"🛒 Gerobak warga terjebak di lubang.",btn:"💪 DORONG",thx:"Gerobak keluar! Kerja sama membuat beban terasa ringan.",pt:60,q:["Gerobak sangat berat. Apa yang sebaiknya dilakukan?",["Mengajak warga lain dan mendorong bersama-sama","Mendorong sendirian sekuat tenaga","Pergi, bukan urusanku"],0,"Gotong royong: pekerjaan berat dikerjakan bersama."]},
+ {k:"musy",ask:"🗣️ Warga sedang musyawarah di balai desa.",btn:"🗣️ IKUT RAPAT",thx:"Pendapatmu didengar. Keputusan diambil bersama!",pt:50,q:["Pendapatmu berbeda dari kebanyakan warga. Sikap yang tepat?",["Memaksakan pendapatmu sampai semua setuju","Menyampaikan dengan sopan dan menghormati hasil kesepakatan","Pergi meninggalkan rapat"],1,"Musyawarah menghargai perbedaan dan menghormati keputusan bersama."]},
+ {k:"damai",ask:"💢 Dua tetangga berselisih paham.",btn:"🕊️ DAMAIKAN",thx:"Mereka berdamai dan saling memaafkan. Rukun lagi!",pt:60,q:["Dua tetangga bertengkar soal batas pagar. Langkah paling bijak?",["Memihak salah satu supaya cepat selesai","Mengajak keduanya bicara baik-baik dengan kepala dingin","Merekam lalu mengunggahnya ke media sosial"],1,"Menengahi dengan tenang menjaga kerukunan warga."]},
+ {k:"sapa",ask:"📦 Tetangga baru sedang pindahan rumah.",btn:"👋 SAPA & BANTU",thx:"Selamat datang di kampung kami!",pt:50,q:["Tetangga baru berasal dari daerah dan budaya yang berbeda. Sikapmu?",["Menyambut ramah dan menawarkan bantuan","Menjauhinya karena berbeda","Menunggu sampai dia yang menyapa duluan"],0,"Toleransi berarti menerima dan menghargai perbedaan."]},
+ {k:"cat",ask:"🖌️ Bapak-bapak mengecat pos ronda.",btn:"🖌️ BANTU CAT",thx:"Pos ronda tampak baru. Kampung makin aman!",pt:60,q:["Cat untuk pos ronda ternyata kurang. Apa tindakan tepat?",["Menyalahkan pengurus","Berembuk dan urunan warga untuk membeli tambahan cat","Berhenti dan pulang"],1,"Masalah bersama diselesaikan lewat musyawarah dan kerja sama."]},
+ {k:"selokan",ask:"🚰 Selokan tersumbat sampah.",btn:"🛠️ BERSIHKAN",thx:"Air mengalir lancar. Tidak banjir lagi!",pt:60,q:["Kamu menemukan sampah menyumbat selokan. Yang benar?",["Memakai sarung tangan, mengangkat sampah, dan membuangnya ke tempat sampah","Mendorong sampah ke selokan tetangga","Menutupnya dengan papan saja"],0,"Menjaga lingkungan adalah tanggung jawab bersama."]}
+];
+let G=null,raf=0,keys={},last=0,acc=0,lP=0,rP=0,hP=0,uP=0,dP=0,AC=null,HND=[[0,0],[0,0]];
+const HP={nenek:[-52,2,1],sampah:[-34,4,1],gerobak:[-90,6,1],musy:[-120,4,1],damai:[0,12,1],sapa:[96,4,-1],cat:[-92,4,1],selokan:[-90,4,1]};
+const cv=$("cv"),cx=cv.getContext("2d");
+function md(a,b){return((a%b)+b)%b}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+function rnd(a,b){return a+Math.random()*(b-a)}
+function mix(a,b,t){let f=i=>parseInt(a.substr(i,2),16),h=i=>parseInt(b.substr(i,2),16),r="#";[1,3,5].forEach(i=>{r+=("0"+Math.round(f(i)+(h(i)-f(i))*t).toString(16)).slice(-2)});return r}
+function snd(f,d,dl){try{if(!AC)AC=new(window.AudioContext||window.webkitAudioContext)();let t=AC.currentTime+(dl||0),o=AC.createOscillator(),gn=AC.createGain();o.type="triangle";o.frequency.value=f;gn.gain.setValueAtTime(.07,t);gn.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(gn);gn.connect(AC.destination);o.start(t);o.stop(t+d)}catch(e){}}
+function stopGame(){cancelAnimationFrame(raf);G=null;lP=rP=hP=uP=dP=0;$("dlg").style.display="none";exitFS()}
+function startAdventure(){initScore();stopGame();$("home").classList.add("hidden");$("result").classList.add("hidden");$("adventure").classList.remove("hidden");fit();enterFS();$("big").textContent="";$("msg").innerHTML="";snd(300,.05);let c=CF[level];
+ let ev=EV.slice().sort(()=>Math.random()-.5).map((b,i)=>Object.assign({},b,{x:Math.round(900+i*(FIN-1700)/7+rnd(-50,50)),done:0,prog:0,missed:0,pat:c.pat,on:0}));
+ let ob=[],types=["puddle","puddle","lubang","ball","ayam","ayam"];
+ for(let x=520;x<FIN-350;x+=c.sp*rnd(.75,1.3)){if(ev.some(e=>Math.abs(e.x-x)<200))continue;let ty=types[Math.floor(rnd(0,6))];ob.push({k:ty,x:x,x0:x,z:Math.round(rnd(-16,6)),d:ty==="puddle"?12:ty==="lubang"?13:9,hit:0,go:0,gone:0,w:ty==="puddle"?80:ty==="lubang"?56:ty==="ball"?24:30,ph:rnd(0,6)})}
+ let pk=[];for(let i=0;i<7;i++)pk.push({x:Math.round(700+i*(FIN-1500)/6+rnd(-80,80)),z:Math.round(rnd(-14,8)),got:0});
+ G={c,ev,ob,pk,pt:[],x:80,vx:0,z:0,ph:0,t:c.t,cd:3.4,sc:0,help:0,miss:0,good:0,en:100,f:0,ms:"",end:0,fin:0,fb:0,near:null,act:0,thx:"",thxT:0,dlg:null,stun:0,wet:0,face:1,cam:0};last=0;acc=0;raf=requestAnimationFrame(loop)}
+function toast(s,n){$("big").textContent=s;G.fb=n}
+function spark(x,y,c,n,sp){for(let i=0;i<n;i++)G.pt.push({x:x,y:y,vx:rnd(-sp,sp),vy:rnd(-sp*1.4,-.5),l:rnd(18,34),c})}
+function openDlg(e){let g=G,q=e.q,ord=q[1].map((_,i)=>i).sort(()=>Math.random()-.5);g.dlg={e,ord,t:g.c.dq*60,max:g.c.dq*60};$("dq").textContent="🧠 "+q[0];$("dtb").style.width="100%";let a=$("da");a.innerHTML="";ord.forEach((n,i)=>{let b=document.createElement("button");b.textContent=String.fromCharCode(65+i)+". "+q[1][n];b.onclick=()=>pick(n);a.appendChild(b)});$("dlg").style.display="block";g.vx=0}
+function pick(n){let g=G;if(!g||!g.dlg)return;let e=g.dlg.e,q=e.q,ok=n===q[2],b;$("dlg").style.display="none";g.dlg=null;
+ if(ok){g.good++;b=e.pt+Math.max(0,Math.floor(g.t/10));g.thx=e.thx;toast("✅ Tepat! +"+b,80);snd(660,.12);snd(880,.2,.12);spark(g.x,GY-60,"#43c47a",14,3)}
+ else{b=Math.round(e.pt*.3);g.thx=(n===-1?"⏰ Terlalu lama berpikir. ":"🤔 Kurang tepat. ")+q[3];toast("🤔 +"+b,80);snd(200,.3)}
+ g.sc+=b;g.thxT=260}
+function hit(o){let g=G;g.ev.forEach(e=>{if(!e.done)e.prog=0});
+ if(o.k==="puddle"){g.wet=150;g.vx*=.4;g.en=Math.max(0,g.en-3);toast("💦 Kena genangan!",45);spark(o.x,GY+6,"#8fc3e6",12,3);snd(240,.15)}
+ else if(o.k==="lubang"){g.stun=55;g.t-=3;g.en=Math.max(0,g.en-8);g.vx=0;toast("🕳️ Terperosok lubang! −3 dtk",70);spark(o.x,GY+6,"#8b6b43",14,3);snd(120,.4)}
+ else if(o.k==="ball"){g.stun=35;g.vx=0;g.en=Math.max(0,g.en-5);o.gone=1;toast("⚽ Tertimpa bola! −5⚡",60);snd(160,.2)}
+ else{g.stun=18;g.vx=0;g.en=Math.max(0,g.en-3);toast("🐔 Kok kok kok!",50);snd(500,.1)}}
+function step(){let g=G;
+ if(g.cd>0){g.cd-=1/60;$("big").textContent=g.cd>.4?Math.ceil(g.cd-.4):"GO!";if(g.cd<=0)$("big").textContent="";g.cam=Math.max(0,g.x-300);return}
+ if(g.end){g.end--;g.vx*=.9;g.x+=g.vx;g.cam+=(Math.max(0,g.x-300)-g.cam)*.12;if(g.end===0)endRace(g.fin);return}
+ if(g.dlg){g.dlg.t--;$("dtb").style.width=Math.max(0,g.dlg.t/g.dlg.max*100)+"%";if(g.dlg.t<=0)pick(-1);return}
+ if(g.fb>0&&--g.fb===0)$("big").textContent="";if(g.thxT>0)g.thxT--;g.t-=1/60;g.f++;
+ let hb=hP||keys[" "]||keys.h||keys.H||keys.Enter,dz=((dP||keys.ArrowDown||keys.s||keys.S)?1:0)-((uP||keys.ArrowUp||keys.w||keys.W)?1:0),dr=g.c.dr;
+ let nr=g.ev.find(e=>!e.done&&!e.missed&&Math.abs(e.x+HP[e.k][0]-g.x)<75)||null;g.near=nr;
+ if(g.stun>0){g.stun--;g.vx*=.8}
+ let can=g.stun<=0;g.act=nr&&hb&&can?1:0;
+ let dir=can?(((lP||keys.ArrowLeft||keys.a||keys.A)?-1:0)+((rP||keys.ArrowRight||keys.d||keys.D)?1:0)):0;if(dir)g.face=dir;
+ if(can&&!g.act&&dz)g.z=clamp(g.z+dz*1.5,ZMIN,ZMAX);
+ let cap=PX*(g.en>0?1:.45)*(g.wet>0?.7:1);if(g.wet>0)g.wet--;
+ if(g.act){let t=HP[nr.k];g.vx=0;g.x+=(nr.x+t[0]-g.x)*.12;g.z+=(t[1]-g.z)*.12;g.face=t[2]}else if(g.stun<=0)g.vx+=(dir*cap-g.vx)*(g.c.rain?.1:.2);
+ g.x=clamp(g.x+g.vx,40,FIN+60);g.ph+=Math.abs(g.vx)*.1;g.cam+=(Math.max(0,g.x-300)-g.cam)*.12;
+ if(g.act)g.en-=.07*dr;else if(Math.abs(g.vx)>.3)g.en-=.018*dr;else g.en+=.05;g.en=clamp(g.en,0,100);
+ if(Math.abs(g.vx)>1&&g.f%9===0)spark(g.x-g.face*8,GY+6+g.z,"#d8c9a0",1,.8);
+ g.ev.forEach(e=>{if(e.done||e.missed)return;
+  if(!e.on&&Math.abs(e.x-g.x)<700&&e.x>g.x-100)e.on=1;
+  if(e.on)e.pat--;
+  if(e.on&&(e.pat<=0||g.x>e.x+170)){e.missed=1;g.miss++;g.sc=Math.max(0,g.sc-15);g.ev.forEach(o=>{});toast("😢 Terlambat! −15",70);snd(180,.3);return}
+  if(e===nr&&g.act){e.prog+=g.en>0?1:.5;if(e.prog>=g.c.hold){e.prog=g.c.hold;e.done=1;g.help++;openDlg(e)}}
+  else if(e.prog>0)e.prog=Math.max(0,e.prog-2)});
+ g.ob.forEach(o=>{if(o.k==="ball"){if(!o.go&&Math.abs(o.x-g.x)<520)o.go=1;if(o.go&&!o.hit)o.x-=2.6}
+  if(o.k==="ayam"){o.x=o.x0+Math.sin(g.f*.012+o.ph)*20;o.z=clamp(-5+Math.sin(g.f*.022+o.ph)*17,-18,10)}
+  if(o.hit||o.gone)return;
+  if(Math.abs(o.x-g.x)<o.w/2+9&&Math.abs(o.z-g.z)<o.d){o.hit=1;hit(o)}});
+ g.pk.forEach(p=>{if(!p.got&&Math.abs(p.x-g.x)<32&&Math.abs(p.z-g.z)<16){p.got=1;g.en=Math.min(100,g.en+35);g.sc+=5;toast("🥤 Segar! +35⚡",45);snd(780,.1);spark(p.x,GY-40,"#ffd36b",10,2.5)}});
+ g.pt.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.15;p.l--});g.pt=g.pt.filter(p=>p.l>0);
+ if(g.x>=FIN){g.fin=1;g.end=80;snd(523,.15);snd(659,.15,.15);snd(784,.3,.3)}else if(g.t<=0)g.end=40}
+function endRace(q){let g=G;$("big").textContent=q?"🏁 SAMPAI BALAI WARGA!":"⏰ Waktu habis!";cancelAnimationFrame(raf);setTimeout(()=>{if(G===g)finishAdventure(Math.max(0,Math.round(g.t)),q,g.sc,g.miss,g.help,g.good)},1300)}
+function loop(ts){raf=requestAnimationFrame(loop);if(!G)return;if(!last)last=ts;acc+=Math.min(50,ts-last);last=ts;while(acc>=16.7){acc-=16.7;if(G)step()}if(G)draw()}
+function fit(){let a=$("adventure"),w=$("wrap"),cw=Math.max(300,a.parentNode.clientWidth-28),sw=screen.width,sh=screen.height,ot=screen.orientation&&screen.orientation.type,por=typeof ot==="string"?ot.indexOf("portrait")===0:(sh>sw),ww=por?Math.max(300,Math.min(2*cw,sh-190)):Math.min(cw,Math.max(300,(sh-100)*2));if(!(ww>0))ww=Math.min(cw,640);a.style.width=(por?ww/2:ww)+"px";a.style.height=(por?ww:ww/2)+"px";w.style.width=ww+"px";w.style.height=ww/2+"px";w.style.transform=por?"translateX("+ww/2+"px) rotate(90deg)":"none";w.style.setProperty("--u",ww/800)}
+addEventListener("resize",()=>{if(G)fit()});addEventListener("orientationchange",()=>setTimeout(()=>{if(G)fit()},200));
+function enterFS(){setTimeout(()=>{try{$("adventure").scrollIntoView({block:"center"})}catch(e){}},60)}
+function exitFS(){}
+
+/* ---------- gambar ---------- */
+function dot(x,y,r,c){cx.fillStyle=c;cx.beginPath();cx.arc(x,y,r,0,7);cx.fill()}
+function emo(t,x,y,s){cx.font=(s||24)+"px Arial";cx.textAlign="center";cx.fillText(t,x,y)}
+function person(x,y,h,col,sw,o){o=o||{};let pr=G?clamp(1-G.t/G.c.t,0,1):0,fc=o.f||1;
+ cx.fillStyle="rgba(0,0,0,.22)";cx.beginPath();cx.ellipse(x-h*.12*(1+pr*2),y+1,h*(.22+pr*.2),h*.05,0,0,7);cx.fill();
+ cx.lineCap="round";cx.strokeStyle=o.pant||"#2b3a55";cx.lineWidth=h*.1;cx.beginPath();cx.moveTo(x-h*.05,y-h*.45);cx.lineTo(x-h*.05+sw,y-h*.04);cx.moveTo(x+h*.05,y-h*.45);cx.lineTo(x+h*.05-sw,y-h*.04);cx.stroke();
+ cx.fillStyle="#1c1c1f";cx.fillRect(x-h*.11+sw,y-h*.05,h*.14,h*.05);cx.fillRect(x-h*.03-sw,y-h*.05,h*.14,h*.05);
+ cx.fillStyle=col;cx.fillRect(x-h*.16,y-h*.86,h*.32,h*.43);cx.fillStyle="rgba(0,0,0,.14)";cx.fillRect(x+h*.06,y-h*.86,h*.1,h*.43);cx.fillStyle="#3a2a1a";cx.fillRect(x-h*.16,y-h*.46,h*.32,h*.04);
+ let ar=o.arm!==undefined?o.arm:sw*.6,up=o.up||0,sy=y-h*.8,H=[o.hl?[x+fc*o.hl[0]*h,y-o.hl[1]*h]:[x-h*.2-ar,y-h*.52+up],o.hr?[x+fc*o.hr[0]*h,y-o.hr[1]*h]:[x+h*.2+ar,y-h*.52+up]];if(o.hl)HND=H;
+ cx.strokeStyle=col;cx.lineWidth=h*.085;cx.lineJoin="round";cx.beginPath();[[x-h*.16,H[0]],[x+h*.16,H[1]]].forEach(([a,d])=>{cx.moveTo(a,sy);cx.lineTo((a+d[0])/2,(sy+d[1])/2+h*.06);cx.lineTo(d[0],d[1])});cx.stroke();cx.lineCap="butt";H.forEach(d=>dot(d[0],d[1],h*.045,"#e0ac69"));
+ if(o.kr){dot(x,y-h*.93,h*.14,o.kr);dot(x+fc*h*.02,y-h*.93,h*.1,"#e8b878")}
+ else{dot(x,y-h*.94,h*.115,"#e8b878");cx.fillStyle=o.hair||"#222";cx.beginPath();cx.arc(x,y-h*.96,h*.12,Math.PI,0);cx.fill()}
+ dot(x+fc*h*.03,y-h*.945,h*.013,"#222");dot(x+fc*h*.075,y-h*.945,h*.013,"#222");
+ if(o.hat){cx.fillStyle="#111";cx.fillRect(x-h*.11,y-h*1.1,h*.22,h*.07)}}
+function mark(x,y,e,g){let by=y-(e.done||e.missed?0:Math.abs(Math.sin(g.f*.1))*5);
+ dot(x,by,15,e.done?"#2e9e5b":e.missed?"#7b8794":"#e5484d");
+ if(!e.done&&!e.missed&&e.on){let fr=clamp(e.pat/g.c.pat,0,1);cx.strokeStyle=fr>.3?"#ffb020":"#ff2d2d";cx.lineWidth=4;cx.beginPath();cx.arc(x,by,20,-Math.PI/2,-Math.PI/2+Math.PI*2*fr);cx.stroke()}
+ cx.fillStyle="#fff";cx.font="bold 18px Arial";cx.textAlign="center";cx.textBaseline="middle";cx.fillText(e.done?"✓":e.missed?"✗":"!",x,by+1);cx.textBaseline="alphabetic";
+ if(!e.done&&!e.missed&&e.prog>0){let w=70,pp=e.prog/g.c.hold;cx.fillStyle="#0007";cx.fillRect(x-w/2,by-34,w,9);cx.fillStyle="#43c47a";cx.fillRect(x-w/2,by-34,w*pp,9)}}
+function scene(e,sx,g){let y=GY,d=e.done,sn=Math.sin(g.f*.25),ap=e.prog/g.c.hold,my=y-132;
+ if(e.k==="nenek"){person(sx,y,80,"#9a5aa8",0,{kr:"#c9a0dc",arm:0});cx.strokeStyle="#7a5230";cx.lineWidth=3;cx.beginPath();cx.moveTo(sx+24,y-42);cx.lineTo(sx+24,y);cx.stroke();
+  if(!d&&ap<.3){cx.fillStyle="#b5895a";cx.fillRect(sx-60,y-30,26,30);cx.fillStyle="#4c9a50";cx.fillRect(sx-84,y-22,22,22);cx.fillStyle="#d96b3b";cx.fillRect(sx-72,y-28,10,6)}else emo("😊",sx,y-92,24)}
+ else if(e.k==="sampah"){if(!d){["#e84a5f","#f4c430","#2a7de1","#8a8f97","#f4a261","#43aa8b"].forEach((c,i)=>{if(i/6<ap)return;cx.fillStyle=c;cx.fillRect(sx-70+i*26,y-8-(i%2)*3,14,9)})}
+  cx.fillStyle="#2f9e5b";cx.fillRect(sx+60,y-46,30,46);cx.fillStyle="#1f7a43";cx.fillRect(sx+57,y-52,36,8);person(sx+110,y,78,"#f4a261",sn*5,{});cx.strokeStyle="#8b5a2b";cx.lineWidth=3;cx.beginPath();cx.moveTo(sx+128,y-52);cx.lineTo(sx+100+sn*8,y);cx.stroke();if(d)emo("✨",sx-20,y-40,26)}
+ else if(e.k==="gerobak"){let o=d?55:ap*30,sk=d?0:12*(1-ap);cx.fillStyle="#2b1d12";cx.beginPath();cx.ellipse(sx,y+3,40,10,0,0,7);cx.fill();
+  cx.fillStyle="#8b5a2b";cx.fillRect(sx-34+o,y-58+sk,68,26);cx.fillStyle="#3a7d44";cx.fillRect(sx-26+o,y-70+sk,22,14);cx.fillRect(sx+4+o,y-68+sk,22,12);dot(sx+o,y-18+sk,16,"#222");dot(sx+o,y-18+sk,6,"#999");
+  person(sx-62+o,y,82,"#6a4c93",5,{arm:20});if(d)emo("💪",sx+o-62,y-95,22)}
+ else if(e.k==="musy"){my=y-172;cx.fillStyle="#8b5a2b";cx.fillRect(sx-100,y-100,8,100);cx.fillRect(sx+92,y-100,8,100);cx.fillStyle="#a0522d";cx.beginPath();cx.moveTo(sx-125,y-98);cx.lineTo(sx,y-150);cx.lineTo(sx+125,y-98);cx.fill();cx.fillStyle="#d9b27a";cx.fillRect(sx-100,y-14,200,14);
+  [[-55,"#e84a5f"],[0,"#2a9d8f"],[55,"#f4a261"]].forEach(([dx,c],i)=>person(sx+dx,y-14,62,c,0,{arm:i===1?Math.max(0,sn*6):0}));person(sx+25,y-14,62,"#6a4c93",0,{});
+  if(d||ap>.3)emo("💬",sx+10,y-92,24)}
+ else if(e.k==="damai"){if(d){person(sx-16,y,82,"#e84a5f",0,{arm:14});person(sx+16,y,82,"#2a9d8f",0,{arm:14,f:-1});emo("❤️",sx,y-100,24)}else{let sh=Math.sin(g.f*.5)*2*(1-ap);person(sx-34+sh+ap*14,y,82,"#e84a5f",0,{arm:12,up:-12});person(sx+34-sh-ap*14,y,82,"#2a9d8f",0,{arm:12,up:-12,f:-1});emo(ap>.5?"🤔":"💢",sx,y-100,24)}}
+ else if(e.k==="sapa"){cx.fillStyle="#b5895a";cx.fillRect(sx+30,y-34,34,34);cx.fillRect(sx+38,y-64,28,30);cx.fillStyle="#d9b27a";cx.fillRect(sx+30,y-20,34,4);person(sx,y,84,"#2878b8",0,{arm:d?Math.abs(sn)*6:0,up:d?-24:0});if(d)emo("👋",sx-26,y-92,24)}
+ else if(e.k==="cat"){cx.fillStyle="#8b5a2b";cx.fillRect(sx-62,y-104,124,8);cx.fillStyle="#bdbdbd";cx.fillRect(sx-56,y-96,112,96);cx.fillStyle="#4f9fd6";cx.fillRect(sx-56,y-96,112*(d?1:ap),96);cx.fillStyle="#fff";cx.font="bold 14px Arial";cx.textAlign="center";cx.fillText("POS RONDA",sx,y-44);
+  person(sx+84,y,82,"#e84a5f",0,{arm:6+Math.abs(sn)*8,up:-16,f:-1})}
+ else if(e.k==="selokan"){cx.fillStyle="#4a3524";cx.fillRect(sx-80,y-4,160,16);cx.fillStyle=d?"#5bb6e8":"#3a3a2a";cx.fillRect(sx-76,y,152,10);
+  if(!d){["#8a8f97","#e84a5f","#f4c430","#2a9d8f","#6a4c93"].forEach((c,i)=>{if(i/5<ap)return;cx.fillStyle=c;cx.fillRect(sx-64+i*30,y-6,16,9)})}
+  person(sx+104,y,82,"#2a9d8f",sn*4,{arm:10,f:-1});cx.strokeStyle="#777";cx.lineWidth=4;cx.beginPath();cx.moveTo(sx+84,y-14);cx.lineTo(sx+52,y+2);cx.stroke();if(d)emo("💧",sx,y-30,22)}
+ if(e.missed)emo("😢",sx,y-104,22);
+ mark(sx,my,e,g)}
+function helpPose(e,g){let ap=e.prog/g.c.hold,s=Math.sin(g.f*.25),k=e.k;
+ if(k==="nenek")return ap<.3?{hl:[.3,.14],hr:[.34,.18],sw:0}:{hl:[.1,.45],hr:[.2,.34],sw:s*5};
+ if(k==="sampah")return{hl:[.18,.42],hr:[.32,.2+.1*s],sw:0};
+ if(k==="gerobak")return{hl:[.52,.5],hr:[.58,.46+.03*s],sw:s*3};
+ if(k==="musy")return{hl:[.12,.45],hr:[.34,.74+.08*s],sw:0};
+ if(k==="damai")return{hl:[-.34,.66],hr:[.34,.66],sw:0};
+ if(k==="sapa")return{hl:[.3,.45+.08*s],hr:[.3,.45+.08*s],sw:0};
+ if(k==="cat")return{hl:[.15,.5],hr:[.5,.6+.1*s],sw:0};
+ return{hl:[.3,.45],hr:[.52,.28+.1*s],sw:0}}
+function helpProp(e,H,g){let k=e.k,ap=e.prog/g.c.hold,l=H[0],r=H[1],fc=g.face;
+ if(k==="nenek"&&ap>=.3){cx.fillStyle="#b5895a";cx.fillRect(r[0]-8,r[1],16,20);cx.fillStyle="#4c9a50";cx.fillRect(l[0]-7,l[1]+2,14,16)}
+ else if(k==="sampah"){cx.fillStyle="#2f9e5b";cx.beginPath();cx.ellipse(l[0],l[1]+12,13,16,0,0,7);cx.fill()}
+ else if(k==="sapa"){cx.fillStyle="#b5895a";cx.fillRect(l[0]-14,l[1]-12,28,24);cx.fillStyle="#d9b27a";cx.fillRect(l[0]-14,l[1]-2,28,4)}
+ else if(k==="cat"){cx.strokeStyle="#7a5230";cx.lineWidth=3;cx.beginPath();cx.moveTo(r[0],r[1]);cx.lineTo(r[0]+fc*18,r[1]-6);cx.stroke();dot(r[0]+fc*20,r[1]-7,4,"#4f9fd6")}
+ else if(k==="selokan"){cx.strokeStyle="#777";cx.lineWidth=4;cx.beginPath();cx.moveTo(l[0],l[1]-24);cx.lineTo(r[0]+fc*26,r[1]+36);cx.stroke()}
+ else if(k==="musy"||k==="damai")emo("💬",r[0],r[1]-26,20)}
+function cloud(x,y){[[0,0,46,15],[30,-8,30,12],[-28,-4,26,11]].forEach(([a,b,c,d])=>{cx.beginPath();cx.ellipse(x+a,y+b,c,d,0,0,7);cx.fill()})}
+function vehicle(i,sx,f){let y=297,dir=i%2?-1:1;
+ if(i%3===2){cx.fillStyle=["#c64e58","#2a7de1","#e8e8e8"][i%3===2?(i>>1)%3:0];cx.fillRect(sx-22,y-14,44,12);cx.fillStyle="#bfe6ff";cx.fillRect(sx-12,y-22,24,9);cx.fillStyle=cx.fillStyle;dot(sx-12,y-1,5,"#111");dot(sx+12,y-1,5,"#111")}
+ else{dot(sx-9,y-1,5,"#111");dot(sx+9,y-1,5,"#111");cx.fillStyle=["#2a7de1","#e84a5f","#2a9d8f","#f4c430"][i%4];cx.fillRect(sx-10,y-11,20,6);person(sx,y-5,26,"#f4a261",0,{f:dir})}}
+function draw(){let g=G,cam=g.cam,W=800,p=clamp(1-g.t/g.c.t,0,1),rain=g.c.rain,f=g.f,sky=(a,b)=>{let m=mix(a,b,p);return rain?mix(m,"#7d8996",.55):m};
+ let gr=cx.createLinearGradient(0,0,0,290);gr.addColorStop(0,sky("#6fb7ee","#e9703f"));gr.addColorStop(1,sky("#eaf6ff","#ffd49a"));cx.fillStyle=gr;cx.fillRect(0,0,W,400);
+ let sy=70+p*185,sxn=690-p*60;if(!rain){let sg=cx.createRadialGradient(sxn,sy,5,sxn,sy,95);sg.addColorStop(0,"#fff6c8ee");sg.addColorStop(1,"#fff6c800");cx.fillStyle=sg;cx.fillRect(sxn-95,sy-95,190,190);dot(sxn,sy,30,mix("#fff1a8","#ff8a2b",p))}
+ cx.fillStyle=rain?"#ffffff88":"#ffffffcc";for(let i=0;i<6;i++)cloud(md(i*260-cam*.12+f*.1,1560)-200,45+(i%3)*32);
+ if(!rain){cx.strokeStyle="#334";cx.lineWidth=1.5;for(let i=0;i<4;i++){let x=md(i*300+f*.8-cam*.3,1200)-200,y=80+i*14+Math.sin(f*.1+i)*5,w=Math.sin(f*.3+i)*3;cx.beginPath();cx.moveTo(x-6,y);cx.quadraticCurveTo(x-3,y-4+w,x,y);cx.quadraticCurveTo(x+3,y-4+w,x+6,y);cx.stroke()}}
+ cx.fillStyle=sky("#9fbbd6","#b78a8a");cx.beginPath();cx.moveTo(0,285);for(let x=0;x<=W;x+=12){let s=x+cam*.06;cx.lineTo(x,200-Math.abs(Math.sin(s/150))*60-14*Math.sin(s/47))}cx.lineTo(W,285);cx.fill();
+ cx.fillStyle=mix("#a8d8a0","#8fa86a",p);cx.beginPath();cx.moveTo(0,285);for(let x=0;x<=W;x+=14)cx.lineTo(x,238+22*Math.sin((x+cam*.2)/120)+9*Math.sin((x+cam*.2)/41));cx.lineTo(W,285);cx.fill();
+ cx.fillStyle=mix("#5aa56b","#4a7a52",p);for(let x=-30;x<W+30;x+=24){let s=Math.floor((x+cam*.35)/24),r=15+md(s*7,6);cx.beginPath();cx.arc(s*24-cam*.35,264-md(s*5,5),r,0,7);cx.fill()}
+ let pc=cam*.55;for(let k=Math.floor(pc/270)-1;k<Math.floor((pc+W)/270)+2;k++){let hx=k*270-pc+md(k*53,40),hh=74+md(k*37,30),m=md(k,4),warung=md(k,5)===2;
+  cx.fillStyle=["#f3d9a4","#cfe3f1","#f1c0b8","#d9ecc6"][m];cx.fillRect(hx,HB-hh,150,hh);cx.fillStyle="rgba(0,0,0,.10)";cx.fillRect(hx+110,HB-hh,40,hh);
+  cx.fillStyle=["#b5523b","#7d5a3c","#9c3d3d","#5f6f7a"][m];cx.beginPath();cx.moveTo(hx-14,HB-hh);cx.lineTo(hx+75,HB-hh-48);cx.lineTo(hx+164,HB-hh);cx.fill();
+  cx.strokeStyle="rgba(0,0,0,.22)";cx.lineWidth=1;for(let i=1;i<5;i++){cx.beginPath();cx.moveTo(hx-14+i*6,HB-hh-i*9.6+9.6);cx.lineTo(hx+164-i*6,HB-hh-i*9.6+9.6);cx.stroke()}
+  cx.fillStyle="#6b4a2f";cx.fillRect(hx+62,HB-44,26,44);cx.fillStyle="#caa56b";cx.fillRect(hx+58,HB-4,34,4);
+  let wc=mix("#8fc3e6","#ffd36b",p);cx.fillStyle=wc;cx.fillRect(hx+14,HB-hh+16,28,24);cx.fillRect(hx+108,HB-hh+16,28,24);cx.fillStyle="rgba(0,0,0,.25)";cx.fillRect(hx+27,HB-hh+16,2,24);cx.fillRect(hx+121,HB-hh+16,2,24);
+  if(warung){cx.fillStyle="#c64e58";cx.fillRect(hx+8,HB-hh-2,134,14);cx.fillStyle="#fff";cx.font="bold 11px Arial";cx.textAlign="center";cx.fillText("WARUNG",hx+75,HB-hh+9)}
+  if(md(k,3)===0){cx.fillStyle="#7a5230";cx.fillRect(hx+156,HB-hh-60,3,60);cx.fillStyle="#e53935";cx.fillRect(hx+159,HB-hh-60,22,7);cx.fillStyle="#fff";cx.fillRect(hx+159,HB-hh-53,22,7)}}
+ cx.fillStyle="#5a5d63";cx.fillRect(0,HB+2,W,22);cx.fillStyle="#e8e0c0";for(let i=0;i<20;i++)cx.fillRect(md(i*60-cam*.85,1200)-100,HB+13,26,2);
+ for(let i=0;i<5;i++){let wx=i%2?9000-md(i*1700+f*(1.5+i*.7),9000):md(i*1700+f*(1.5+i*.7),9000)-400,sx=wx-cam*.85;if(sx>-60&&sx<860)vehicle(i,sx+0,f)}
+ cx.fillStyle=mix("#6fbf73","#6a9a55",p);cx.fillRect(0,HB+24,W,PB-HB-24+2);
+ for(let k=Math.floor(cam/700)-1;k<Math.floor((cam+W)/700)+2;k++){let px=k*700+300-cam,nx=px+700;cx.strokeStyle="#222";cx.lineWidth=1.5;cx.beginPath();cx.moveTo(px,214);cx.quadraticCurveTo((px+nx)/2,236,nx,214);cx.stroke();cx.fillStyle="#4a3a2a";cx.fillRect(px-3,208,6,PB-208);cx.fillRect(px-18,214,36,4)}
+ for(let k=Math.floor(cam/230)-1;k<Math.floor((cam+W)/230)+2;k++){let tx=k*230+md(k*61,60)-cam;
+  if(md(k,2)===0){cx.strokeStyle="#7a5a3a";cx.lineWidth=7;cx.beginPath();cx.moveTo(tx,PB);cx.quadraticCurveTo(tx+14,PB-50,tx+8,PB-96);cx.stroke();cx.strokeStyle=mix("#2f8f4e","#3d6e45",p);cx.lineWidth=4;for(let a=0;a<7;a++){let an=a/7*Math.PI*2+Math.sin(f*.03+k)*.08;cx.beginPath();cx.moveTo(tx+8,PB-96);cx.quadraticCurveTo(tx+8+Math.cos(an)*22,PB-96-Math.abs(Math.sin(an))*16-6,tx+8+Math.cos(an)*38,PB-96+Math.sin(an)*18+8);cx.stroke()}}
+  else{cx.fillStyle="#7a5230";cx.fillRect(tx-5,PB-48,10,48);dot(tx,PB-62,30,mix("#2f8f4e","#3d6e45",p));dot(tx-11,PB-54,19,mix("#3aa860","#4a8456",p))}
+  dot(tx+80,PB-5,9,mix("#3b9b57","#3d6e45",p));dot(tx+92,PB-3,7,mix("#4ab868","#4a8456",p))}
+ let pg=cx.createLinearGradient(0,PB,0,400);pg.addColorStop(0,mix("#d9bb86","#b89a68",p));pg.addColorStop(1,mix("#c29f66","#9b7f52",p));cx.fillStyle=pg;cx.fillRect(0,PB,W,74);cx.fillStyle="rgba(0,0,0,.18)";cx.fillRect(0,PB,W,3);
+ cx.fillStyle="rgba(120,90,50,.35)";for(let i=0;i<30;i++){let x=md(i*83-cam,1250)-120;cx.beginPath();cx.ellipse(x,PB+10+md(i*29,58),7+md(i,5),2,0,0,7);cx.fill()}
+ cx.strokeStyle="rgba(90,60,30,.25)";cx.lineWidth=1;for(let i=0;i<10;i++){let x=md(i*211-cam,1300)-150;cx.beginPath();cx.moveTo(x,PB+20+md(i*17,40));cx.lineTo(x+18,PB+24+md(i*17,40));cx.lineTo(x+30,PB+20+md(i*17,40));cx.stroke()}
+ let fx=FIN-cam;if(fx>-200&&fx<1000){cx.fillStyle="#8b5a2b";cx.fillRect(fx-110,PB-130,10,130);cx.fillRect(fx+100,PB-130,10,130);cx.fillStyle="#a0522d";cx.beginPath();cx.moveTo(fx-140,PB-125);cx.lineTo(fx,PB-190);cx.lineTo(fx+140,PB-125);cx.fill();cx.fillStyle="#d9b27a";cx.fillRect(fx-110,PB-16,220,16);cx.fillStyle="#c64e58";cx.fillRect(fx-70,PB-120,140,26);cx.fillStyle="#fff";cx.font="bold 15px Arial";cx.textAlign="center";cx.fillText("🏁 BALAI WARGA",fx,PB-102);emo("🇮🇩",fx-90,PB-136,20);emo("🇮🇩",fx+90,PB-136,20)}
+ g.pk.forEach(k=>{if(k.got)return;let sx=k.x-cam;if(sx<-40||sx>840)return;cx.fillStyle="rgba(0,0,0,.2)";cx.beginPath();cx.ellipse(sx,GY+k.z+2,12,3,0,0,7);cx.fill();emo("🥤",sx,GY+k.z,26)});
+ const drawOb=o=>{let sx=o.x-cam;if(sx<-120||sx>920||o.gone)return;let y=GY+o.z,ah=o.x-g.x;
+  if(o.k==="puddle"){cx.fillStyle=mix("#5d7f9a","#8a6a60",p);cx.beginPath();cx.ellipse(sx,y+6,o.w/2,9,0,0,7);cx.fill();cx.fillStyle="rgba(255,255,255,.35)";cx.beginPath();cx.ellipse(sx-12,y+4,o.w/4,3,0,0,7);cx.fill();cx.strokeStyle="rgba(255,255,255,.4)";cx.lineWidth=1;let rr=md(f,40)/40;cx.beginPath();cx.ellipse(sx+10,y+7,6+rr*12,2+rr*3,0,0,7);cx.stroke()}
+  else if(o.k==="lubang"){cx.fillStyle="#3b2a1b";cx.beginPath();cx.ellipse(sx,y+6,32,11,0,0,7);cx.fill();cx.fillStyle="#150e08";cx.beginPath();cx.ellipse(sx,y+8,25,7,0,0,7);cx.fill();cx.fillStyle="#ff7a1a";cx.beginPath();cx.moveTo(sx+34,y+8);cx.lineTo(sx+40,y-20);cx.lineTo(sx+46,y+8);cx.fill();cx.fillStyle="#fff";cx.fillRect(sx+36,y-10,8,4)}
+  else if(o.k==="ball"){cx.fillStyle="rgba(0,0,0,.2)";cx.beginPath();cx.ellipse(sx,y+3,12,3,0,0,7);cx.fill();cx.save();cx.translate(sx,y-12);cx.rotate(f*-.2);dot(0,0,12,"#fff");dot(0,0,4.5,"#222");dot(8,4,3,"#222");dot(-7,6,3,"#222");dot(-3,-9,3,"#222");cx.restore()}
+  else{cx.fillStyle="rgba(0,0,0,.2)";cx.beginPath();cx.ellipse(sx,y+3,12,3,0,0,7);cx.fill();emo("🐔",sx,y-2+Math.abs(Math.sin(f*.2+o.ph))*-3,30)}
+  if(!o.hit&&ah>0&&ah<300&&md(f,30)<20)emo("⚠️",sx,y-54,22)};g.ob.filter(o=>o.z<=g.z).forEach(drawOb);
+ g.ev.forEach(e=>{let sx=e.x-cam;if(sx>-180&&sx<980)scene(e,sx,g)});
+ let px=g.x-cam,py=GY+6+g.z,ps=1+g.z*.004,pe=g.act?g.near:null,hp=pe?helpPose(pe,g):{},sw=hp.sw!==undefined?hp.sw:(Math.abs(g.vx)>.3?Math.sin(g.ph)*13:0);
+ cx.save();if(g.stun>0)cx.translate(Math.sin(f)*2,0);person(px,py,108*ps,"#2878b8",sw,Object.assign({hat:1,hair:"#111",f:g.face},hp));cx.restore();
+ if(pe)helpProp(pe,HND,g);if(g.wet>0)emo("💦",px-30,py-26,16);if(g.stun>0)emo("💫",px,py-119*ps,22);
+ g.ob.filter(o=>o.z>g.z).forEach(drawOb);
+ g.pt.forEach(q=>{cx.globalAlpha=clamp(q.l/20,0,1);cx.fillStyle=q.c;cx.fillRect(q.x-cam,q.y,3,3)});cx.globalAlpha=1;
+ for(let k=Math.floor(cam*1.3/260)-1;k<Math.floor((cam*1.3+W)/260)+2;k++){let bx=k*260+md(k*47,90)-cam*1.3;dot(bx,416,34,mix("#2f8f4e","#2c5a3a",p));dot(bx+26,420,26,mix("#3aa860","#356e48",p))}
+ if(p>0){cx.fillStyle="rgba(255,110,30,"+(p*.17)+")";cx.fillRect(0,0,W,400)}
+ if(rain){cx.fillStyle="rgba(40,55,75,.22)";cx.fillRect(0,0,W,400);cx.strokeStyle="rgba(210,225,240,.55)";cx.lineWidth=1;cx.beginPath();for(let i=0;i<110;i++){let x=md(i*97+f*3,840)-20,y=md(i*53+f*14,420)-10;cx.moveTo(x,y);cx.lineTo(x-3,y+12)}cx.stroke()}
+ let vg=cx.createRadialGradient(400,200,180,400,200,520);vg.addColorStop(0,"rgba(0,0,0,0)");vg.addColorStop(1,"rgba(0,0,0,.3)");cx.fillStyle=vg;cx.fillRect(0,0,W,400);
+ cx.save();cx.translate(0,6);let bw=190,bx0=250;cx.fillStyle="rgba(0,0,0,.55)";cx.fillRect(bx0-4,356,bw+8,40);cx.fillStyle="#fff";cx.font="bold 10px Arial";cx.textAlign="left";cx.fillText("⚡ STAMINA"+(g.en<=0?" HABIS!":""),bx0,367);cx.fillStyle="#333";cx.fillRect(bx0,370,bw,8);cx.fillStyle=g.en>50?"#43c47a":g.en>20?"#f2b544":"#e5484d";cx.fillRect(bx0,370,bw*g.en/100,8);
+ cx.fillStyle="#555";cx.fillRect(bx0,388,bw,3);g.ev.forEach(e=>{dot(bx0+e.x/FIN*bw,389.5,4,e.done?"#43c47a":e.missed?"#e5484d":"#f2b544")});cx.fillStyle="#fff";cx.beginPath();let mx=bx0+clamp(g.x/FIN,0,1)*bw;cx.moveTo(mx,383);cx.lineTo(mx-4,378);cx.lineTo(mx+4,378);cx.fill();cx.restore();
+ let ms="",nx=g.ev.find(e=>!e.done&&!e.missed&&e.x>g.x-75&&e.x-g.x<650),ob=g.ob.find(o=>!o.hit&&!o.gone&&o.x-g.x>-10&&o.x-g.x<260),W2={puddle:"💦 Genangan air di depan — menyingkir lewat jalur lain atau jalan pelan.",lubang:"🕳️ Lubang jalan — geser jalur ▲▼ untuk menghindar!",ball:"⚽ Bola menggelinding ke arahmu — geser jalur ▲▼!",ayam:"🐔 Ayam menyeberang — tunggu sebentar atau geser jalur!"};
+ if(g.thxT>0)ms="😊 <b>"+g.thx+"</b>";else if(g.near)ms=g.near.prog>0?"🤝 <b>Sedang membantu...</b> "+Math.round(g.near.prog/g.c.hold*100)+"% — tetap tahan tombolnya!":"<b>"+g.near.ask+"</b> TAHAN <b>"+g.near.btn+"</b> (+"+g.near.pt+"). Cepat, warga tidak bisa menunggu lama!";
+ else if(g.en<=0)ms="😮‍💨 <b>Stamina habis!</b> Jalanmu melambat. Berhenti sejenak atau cari 🥤.";else if(ob)ms=W2[ob.k];else if(nx)ms="👀 "+nx.ask+" Dekati dia ➡️";
+ else ms=g.x<600?"📋 <b>Aturan:</b> ◀ ▶ jalan, ▲▼ pindah jalur. Tahan BANTU di dekat warga, lalu pilih tindakan yang tepat. Warga yang terlambat dibantu = −15. Jaga stamina ⚡!":"🚶 Teruslah berjalan menuju balai warga. Waspadai rintangan di jalan!";
+ if(g.ms!==ms){g.ms=ms;$("msg").innerHTML=ms}
+ let hb=$("help"),lab=g.near?g.near.btn:"🤝 BANTU";if(hb.textContent!==lab)hb.textContent=lab;hb.classList.toggle("off",!g.near);hb.classList.toggle("go",!!g.near&&!g.act);
+ $("hRank").textContent=(level==="sulit"?"🏆 ":level==="sedang"?"🔥 ":"🌱 ")+"📍"+Math.min(100,Math.round(g.x/FIN*100))+"%";$("hCoin").textContent=g.sc;$("hVio").textContent=g.miss;$("hHelp").textContent=g.help;$("hTime").textContent=Math.max(0,Math.ceil(g.t))}
+function holdBtn(id,f){let b=$(id);b.onpointerdown=e=>{e.preventDefault();try{if(AC&&AC.state==="suspended")AC.resume()}catch(x){}b.setPointerCapture(e.pointerId);f(1);b.classList.add("on")};b.onpointerup=b.onpointercancel=()=>{f(0);b.classList.remove("on")};b.oncontextmenu=e=>e.preventDefault()}
+holdBtn("lft",v=>lP=v);holdBtn("rgt",v=>rP=v);holdBtn("help",v=>hP=v);holdBtn("up",v=>uP=v);holdBtn("dn",v=>dP=v);
+addEventListener("keydown",e=>{keys[e.key]=1;if(G&&G.dlg&&e.key>="1"&&e.key<="3"){let n=G.dlg.ord[+e.key-1];if(n!==undefined)pick(n)}if(G&&(e.key.startsWith("Arrow")||e.key===" "))e.preventDefault()});
+addEventListener("keyup",e=>keys[e.key]=0);
+function finishAdventure(left,q,sc0,miss,hp,good){stopGame();$("adventure").classList.add("hidden");$("result").classList.remove("hidden");let st=q?(hp>=7&&good>=6?3:hp>=5&&good>=4?2:1):0,sc=Math.round((sc0+(q?left*2+100:0))*(level==="sulit"?1.5:level==="sedang"?1.2:1));
+ $("medal").textContent=q?(st===3?"🏆":"🏁"):"⏰";$("resultTitle").textContent=q?(st===3?"Warga Teladan Kampung!":st===2?"Warga yang Peduli!":"Sampai Balai Warga, Ayo Lebih Peduli"):"Waktu Habis, Coba Lagi!";$("finalScore").textContent=sc;
+ [["rightCount","Warga Dibantu",hp+"/8"],["accuracy","Pilihan Tepat",good+"/8"],["best","Sisa Waktu",left+" dtk"]].forEach(([i,l,v])=>{$(i).textContent=v;$(i).parentNode.firstChild.textContent=l});
+ $("resultText").textContent=q?(st===3?"⭐⭐⭐ Luar biasa! Kamu cekatan membantu warga dan bijak mengambil keputusan.":"Kamu sampai di balai warga "+"⭐".repeat(st)+". Warga dibantu: "+hp+"/8, pilihan tepat: "+good+"/8, terlewat: "+miss+". Raih bintang 3 dengan membantu minimal 7 warga dan 6 pilihan tepat!"):"Balai warga belum tercapai. Jaga stamina 🥤, hindari rintangan, dan atur waktumu!"}
+
+function replay(){ $("result").classList.add("hidden");$("home").classList.remove("hidden");$("settings").classList.remove("hidden");$("launch").disabled=false}
+function toHome(){clearInterval(timer);$("play").classList.add("hidden");$("adventure").classList.add("hidden");$("result").classList.add("hidden");$("home").classList.remove("hidden");$("settings").classList.add("hidden");mode="";topic="";stopGame()}
+</script></body></html>
